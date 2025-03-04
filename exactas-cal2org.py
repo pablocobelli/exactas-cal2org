@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Standard library imports
+import os
 import re
 import sys
 from datetime import datetime
