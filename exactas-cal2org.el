@@ -1,4 +1,4 @@
-;;; exactas_cal2org.el --- Description -*- lexical-binding: t; -*-
+;;; exactas-cal2org.el --- Description -*- lexical-binding: t; -*-
 ;;
 ;; Copyright (C) 2025 Pablo Cobelli
 ;;
@@ -8,7 +8,7 @@
 ;; Modified: March 04, 2025
 ;; Version: 0.0.1
 ;; Keywords: abbrev bib c calendar comm convenience data docs emulations extensions faces files frames games hardware help hypermedia i18n internal languages lisp local maint mail matching mouse multimedia news outlines processes terminals tex text tools unix vc
-;; Homepage: https://github.com/pablocobelli/exactas_cal2org
+;; Homepage: https://github.com/pablocobelli/exactas-cal2org
 ;; Package-Requires: ((emacs "24.3"))
 ;;
 ;; This file is not part of GNU Emacs.
@@ -30,5 +30,5 @@
          (output (shell-command-to-string (format "python3 %s" script))))
     (insert output)))  ;; Insert the script output at point
 
-(provide 'exactas_cal2org)
-;;; exactas_cal2org.el ends here
+(provide 'exactas-cal2org)
+;;; exactas-cal2org.el ends here
