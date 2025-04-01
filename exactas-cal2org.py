@@ -14,11 +14,13 @@ import dateparser
 from bs4 import BeautifulSoup
 
 # CONSTANTS
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+YAML_FILE = "calendar_headers_list.yaml"
 CALENDAR_URL = "https://exactas.uba.ar/calendario-academico/"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+HEADERS_FILE = os.path.join(SCRIPT_DIR, YAML_FILE)
+
 CURRENT_YEAR = datetime.now().year
 DAYS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
-HEADERS_FILE = os.path.join(SCRIPT_DIR, "calendar_headers_list.yaml")
 MONTHS_DICT = {
     "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
     "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
@@ -362,9 +364,10 @@ def create_org_contents_from_calendar_headers(soup, cal_headers):
     """
 
     print("* " + str(CURRENT_YEAR))
+    print("** FECHAS DE CURSADA Y DE FINALES")
 
     for cal_header, cal_header_short_name in cal_headers.items():
-        print("** " + cal_header)
+        print("*** " + cal_header)
         section_text = get_section_lines(soup, cal_header)
         extra_suffix_for_multiple_exam_dates = ''
         for line in section_text:
@@ -383,7 +386,7 @@ def create_org_contents_from_calendar_headers(soup, cal_headers):
                     date_for_event = parse_date_from_string(date_or_timeframe[0])
                     formatted_date_for_event = date_for_event.strftime("<%Y-%m-%d %a>")
                     event_name = normalize_event_casing(event_name)
-                    print("*** " + cal_header_short_name + " " + event_name +
+                    print("**** " + cal_header_short_name + " " + event_name +
                         extra_suffix_for_multiple_exam_dates)
                     print(formatted_date_for_event)
                 else:
@@ -398,7 +401,7 @@ def create_org_contents_from_calendar_headers(soup, cal_headers):
                     event_name = strip_event_affixes(event_name)
                     # Hagamoslo lowercase, luego capitalizamos la primera letra
                     event_name = normalize_event_casing(event_name)
-                    print("*** " + cal_header_short_name + " " + event_name +
+                    print("**** " + cal_header_short_name + " " + event_name +
                         extra_suffix_for_multiple_exam_dates)
                     print(period)
 
