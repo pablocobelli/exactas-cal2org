@@ -527,6 +527,9 @@ def create_org_contents_from_holidays_header(soup):
             output_text += f"<{formatted_date_for_heading}>\n"
             output_text += f"Condición: {condition}.\n"
 
+    # Remove extra "\n" that adds unwanted space after last entry
+    output_text = output_text.rstrip("\n")
+
     # Print the holidays section
     print(output_text)
     return None
@@ -583,7 +586,7 @@ def add_entry_for_science_week(soup, science_week_name):
                         dates.append(date.strftime('%Y-%m-%d'))
 
                     output_text += f"*** {science_week_name}\n"
-                    output_text += f"<{dates[0]}>-<{dates[2]}>"
+                    output_text += f"<{dates[0]}>-<{dates[2]}>\n"
                     break
             else:
                 print("Mes no encontrado en el texto.")
@@ -592,8 +595,7 @@ def add_entry_for_science_week(soup, science_week_name):
     else:
         print("Texto no encontrado en la página.")
 
-    print(output_text)
-    return None
+    return output_text
 
 def create_org_contents_from_science_weeks_header(soup, headers_semanas):
     """
@@ -612,10 +614,11 @@ def create_org_contents_from_science_weeks_header(soup, headers_semanas):
         None
     """
 
-    print("** SEMANAS DE LAS CIENCIAS")
+    output_text = "** SEMANAS DE LAS CIENCIAS\n"
     for individual_science_week in headers_semanas.keys():
-        add_entry_for_science_week(soup, individual_science_week)
+        output_text += add_entry_for_science_week(soup, individual_science_week)
 
+    print(output_text)
     return None
 
 if __name__ == '__main__':
