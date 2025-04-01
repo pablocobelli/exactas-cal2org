@@ -396,6 +396,27 @@ def create_org_contents_from_calendar_headers(soup, cal_headers):
                     print(period)
 
 def get_events_from_yaml_file():
+    """
+    Loads event data from a YAML file and returns relevant calendar headers.
+
+    This function reads the list of calendar headers from a YAML file and extracts
+    information about course dates, holidays, and science weeks. It checks for the
+    presence of specific headers in the YAML data and returns the relevant sections.
+
+    Returns:
+        tuple: A tuple containing three elements:
+            - `headers_cursada` (dict or None): The data associated with "FECHAS DE CURSADA Y DE FINALES" if present, otherwise None.
+            - `headers_semanas` (dict or None): The data associated with "SEMANAS DE LAS CIENCIAS" if present, otherwise None.
+            - `include_holidays` (bool or None): True if "FERIADOS" is found in the headers, otherwise None.
+
+    Notes:
+        - The function checks for the presence of three specific headers in the YAML file:
+          1. "FECHAS DE CURSADA Y DE FINALES"
+          2. "FERIADOS"
+          3. "SEMANAS DE LAS CIENCIAS"
+        - If any of these headers are found, the corresponding data is extracted and returned.
+        - If a header is not found, its corresponding return value will be None.
+    """
 
     # Load the list of calendar headers from the YAML file
     all_headers = read_event_list_from_yaml(HEADERS_FILE)
@@ -446,6 +467,33 @@ def main():
     return 0
 
 def create_org_contents_from_holidays_header(soup):
+    """
+    Extracts holiday information from the last table in an HTML document
+    and formats it into an Org-mode section.
+
+    This function locates the last `<table>` element in the parsed HTML,
+    extracts holiday details from its rows, and converts the dates into
+    a standardized format. The formatted output is printed in Org-mode syntax.
+
+    Args:
+        soup: A BeautifulSoup object representing the parsed HTML document.
+
+    Returns:
+        None. The formatted holiday entries are printed to the console.
+
+    Notes:
+        - The function assumes the last table in the HTML contains holiday data.
+        - Each row is expected to have four columns:
+          1. Day of the week (e.g., "Lunes")
+          2. Date in text format (e.g., "1 de mayo")
+          3. Event name (e.g., "Día del Trabajador")
+          4. Condition (e.g., "Feriado nacional")
+        - The function corrects potential typos in day and month names.
+        - Dates are formatted as `YYYY-MM-DD` for Org-mode compatibility.
+        - If the condition is missing, it defaults to "No especificada en el sitio web".
+        - If the date format is invalid, it is labeled as "Fecha inválida".
+    """
+
     # Holidays are listed in the last table of the website
     holidays_table = soup.find_all("table")[-1]
 
@@ -485,6 +533,30 @@ def create_org_contents_from_holidays_header(soup):
 
 
 def add_entry_for_science_week(soup, science_week_name):
+    """
+    Extracts and formats the date range for a given science week from an HTML document.
+
+    This function searches for a `<strong>` tag containing the specified science week name
+    in a BeautifulSoup-parsed HTML document. If found, it extracts the following sibling text,
+    attempts to identify a month and corresponding dates, and formats them in Org-mode syntax.
+
+    Args:
+        soup: A BeautifulSoup object representing the parsed HTML document.
+        science_week_name (str): The name of the science week to search for.
+
+    Returns:
+        None. The formatted entry is printed to the console.
+
+    Notes:
+        - The function relies on `MONTHS_DICT`, a dictionary mapping month names to their
+          respective numerical values.
+        - The extracted dates are expected to follow the pattern "day1, day2, day3 month".
+        - The formatted output follows the pattern:
+          ```
+          *** Science Week Name
+          <YYYY-MM-DD>-<YYYY-MM-DD>
+          ```
+    """
 
     output_text = ""
 
@@ -524,6 +596,21 @@ def add_entry_for_science_week(soup, science_week_name):
     return None
 
 def create_org_contents_from_science_weeks_header(soup, headers_semanas):
+    """
+    Generate an Org-mode formatted content section for "Semanas de las Ciencias".
+
+    This function prints a section header for "Semanas de las Ciencias" and iterates
+    over the provided dictionary of science week headers, calling
+    `add_entry_for_science_week` for each entry.
+
+    Args:
+        soup: A BeautifulSoup object representing the parsed HTML document.
+        headers_semanas (dict): A dictionary where keys represent individual
+                                science week identifiers.
+
+    Returns:
+        None
+    """
 
     print("** SEMANAS DE LAS CIENCIAS")
     for individual_science_week in headers_semanas.keys():
