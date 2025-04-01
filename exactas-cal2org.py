@@ -441,7 +441,7 @@ def main():
     if include_holidays is not None:
         create_org_contents_from_holidays_header(soup)
     if headers_semanas is not None:
-        create_org_contents_from_science_weeks_header(soup)
+        create_org_contents_from_science_weeks_header(soup, headers_semanas)
 
     return 0
 
@@ -484,7 +484,7 @@ def create_org_contents_from_holidays_header(soup):
     return None
 
 
-def add_entries_for_science_week(soup, science_week_name):
+def add_entry_for_science_week(soup, science_week_name):
 
     output_text = ""
 
@@ -523,16 +523,12 @@ def add_entries_for_science_week(soup, science_week_name):
     print(output_text)
     return None
 
-def create_org_contents_from_science_weeks_header(soup):
-    # These entries could be read from the YAML
+def create_org_contents_from_science_weeks_header(soup, headers_semanas):
+
     print("** SEMANAS DE LAS CIENCIAS")
-    add_entries_for_science_week(soup, "Semana de la Matemática y de las Ciencias de Datos")
-    add_entries_for_science_week(soup, "Semana de las Ciencias de la Tierra")
-    add_entries_for_science_week(soup, "Semana de la Física")
-    add_entries_for_science_week(soup, "Semana de la Computación y de las Ciencias de Datos")
-    add_entries_for_science_week(soup, "Semana de la Biología")
-    add_entries_for_science_week(soup, "Semana de la Química y de los Alimentos")
-    add_entries_for_science_week(soup, "Semana de la Enseñanza de las Ciencias")
+    for individual_science_week in headers_semanas.keys():
+        add_entry_for_science_week(soup, individual_science_week)
+
     return None
 
 if __name__ == '__main__':
