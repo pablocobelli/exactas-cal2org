@@ -1,0 +1,54 @@
+#+TITLE: exactas-cal2org
+#+AUTHOR: Pablo Cobelli
+#+DESCRIPTION: Emacs package for generating org-agenda entries from the Exactas academic calendar.
+
+* Overview
+
+exactas-cal2org is an Emacs package designed to convert the academic calendar of Facultad de Ciencias Exactas y Naturales (Exactas) into Org-mode agenda entries. This integration allows students and faculty to seamlessly incorporate academic events into their personal org-agenda in Emacs, facilitating better planning and organization.
+
+* Installation
+
+** Prerequisites
+
+- Ensure you have Emacs installed on your system.
+- Python 3.x must be available, as the package relies on a Python script for processing the academic calendar.
+
+** Installing exactas-cal2org in Doom Emacs
+
+To install exactas-cal2org in Doom Emacs, you'll need to add it to your `packages.el` file with a recipe pointing to its GitHub repository. Follow these steps:
+
+1. Edit the `packages.el` config file and add the following:
+
+#+BEGIN_SRC emacs-lisp
+(package! exactas-cal2org
+  :recipe (:host github
+           :repo "pablocobelli/exactas-cal2org"
+           :files ("exactas-cal2org.el" "exactas-cal2org.py" "calendar_headers_list.yaml")))
+#+END_SRC
+
+2. Save the `packages.el` file.
+
+3. Run =doom sync= to apply the changes.
+
+* Usage
+
+Once installed, you can use exactas-cal2org to generate org-agenda entries from the Exactas academic calendar. The package provides functions to fetch, process, and insert academic events into your org files. Detailed usage instructions and available commands can be found in the package's documentation.
+
+* Python Script Functionality
+
+The core functionality of =exactas-cal2org= relies on a Python script that processes the academic calendar data. Here's a brief overview of its modus operandi:
+
+1. **Data Retrieval**: The script fetches the academic calendar data, which may be stored in a specific format or sourced from an online resource.
+
+2. **Parsing**: It parses the retrieved data to extract relevant information such as dates, event descriptions, and categories.
+
+3. **Org Entry Generation**: Using the parsed data, the script generates Org-mode formatted entries corresponding to each academic event.
+
+4. **Integration with Emacs**: The generated Org entries are then inserted into a designated org file within Emacs, making them available in your org-agenda.
+
+For more detailed information on the script's functionality and customization options, please refer to the source code and comments within the `exactas-cal2org.py` file in the repository.
+
+* License
+
+This project is licensed under the MIT License. See the LICENSE file for more details.
+
