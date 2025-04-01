@@ -2,17 +2,27 @@
 #
 # En cada linea se registra una sección del calendario.
 # Los valores detras de los dos puntos ":" indican el texto
-#   prefijo con el que se ingresará la información al org-agenda.
+#   prefijo con el que se ingresará la información a org-agenda.
 
-CURSO DE VERANO: 0CUAT
-EXÁMENES – TURNO FEBRERO-MARZO: Finales Feb-Mar
-PRIMER CUATRIMESTRE: 1CUAT
-EXÁMENES – TURNO ABRIL: Finales Apr
-EXÁMENES – TURNO MAYO: Finales May
-EXÁMENES – TURNO JUNIO: Finales Jun
-EXÁMENES – TURNO JULIO: Finales Jul-Ago
-SEGUNDO CUATRIMESTRE: 2CUAT
-EXÁMENES – TURNO SEPTIEMBRE: Finales Sep
-EXÁMENES – TURNO OCTUBRE: Finales Oct
-EXÁMENES – TURNO NOVIEMBRE: Finales Nov
-EXÁMENES – TURNO DICIEMBRE: Finales Dec
+FECHAS DE CURSADA Y DE FINALES:
+  CURSO DE VERANO: 0CUAT
+  EXÁMENES – TURNO FEBRERO-MARZO: Finales Feb-Mar
+  PRIMER CUATRIMESTRE: 1CUAT
+  EXÁMENES – TURNO ABRIL: Finales Apr
+  EXÁMENES – TURNO MAYO: Finales May
+  EXÁMENES – TURNO JUNIO: Finales Jun
+  EXÁMENES – TURNO JULIO: Finales Jul-Ago
+  SEGUNDO CUATRIMESTRE: 2CUAT
+  EXÁMENES – TURNO SEPTIEMBRE: Finales Sep
+  EXÁMENES – TURNO OCTUBRE: Finales Oct
+  EXÁMENES – TURNO NOVIEMBRE: Finales Nov
+  EXÁMENES – TURNO DICIEMBRE: Finales Dec
+FERIADOS:
+SEMANAS DE LAS CIENCIAS:
+  Semana de la Matemática y de las Ciencias de Datos:
+  Semana de las Ciencias de la Tierra:
+  Semana de la Física:
+  Semana de la Computación y de las Ciencias de Datos:
+  Semana de la Biología:
+  Semana de la Química y de los Alimentos:
+  Semana de la Enseñanza de las Ciencias:

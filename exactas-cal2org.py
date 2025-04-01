@@ -395,6 +395,33 @@ def create_org_contents_from_calendar_headers(soup, cal_headers):
                         extra_suffix_for_multiple_exam_dates)
                     print(period)
 
+def get_events_from_yaml_file():
+
+    # Load the list of calendar headers from the YAML file
+    all_headers = read_event_list_from_yaml(HEADERS_FILE)
+
+    main_header_cursada = "FECHAS DE CURSADA Y DE FINALES"
+    main_header_feriados = "FERIADOS"
+    main_header_semanas = "SEMANAS DE LAS CIENCIAS"
+
+    if main_header_cursada in all_headers:
+        headers_cursada = all_headers["FECHAS DE CURSADA Y DE FINALES"]
+    else:
+        headers_cursada = None
+
+    if main_header_feriados in all_headers:
+        include_holidays = True
+    else:
+        include_holidays = None
+
+    if main_header_semanas in all_headers:
+        headers_semanas = all_headers["SEMANAS DE LAS CIENCIAS"]
+    else:
+        headers_semanas = None
+
+    return headers_cursada, headers_semanas, include_holidays
+
+
 def main():
     """Fetch the academic calendar, extract events, and print them in Org-mode format."""
 
@@ -405,19 +432,16 @@ def main():
         print("Error: Failed to fetch the webpage.", file=sys.stderr)
         return 1
 
-    # Load the list of calendar headers from the YAML file
-    cal_headers = read_event_list_from_yaml(HEADERS_FILE)
-    if not cal_headers:
-        # display error message and return error code (1)
-        print("Error: No calendar headers found in the YAML file.", file=sys.stderr)
-        return 1
+    # Separate each calendar section based on the given headers
+    # by one of the three types of header: cursada, semanas, feriados
+    headers_cursada, headers_semanas, include_holidays = get_events_from_yaml_file()
 
-    # Process each calendar section based on the given headers,
-    # extract events, and print them line by line in Org-mode format
-    # for their use with org-agenda
-    create_org_contents_from_calendar_headers(soup, cal_headers)
-    create_org_contents_from_holidays_header(soup)
-    create_org_contents_from_science_weeks_header(soup)
+    if headers_cursada is not None:
+        create_org_contents_from_calendar_headers(soup, headers_cursada)
+    if include_holidays is not None:
+        create_org_contents_from_holidays_header(soup)
+    if headers_semanas is not None:
+        create_org_contents_from_science_weeks_header(soup)
 
     return 0
 
