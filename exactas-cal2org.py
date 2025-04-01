@@ -15,9 +15,21 @@ from bs4 import BeautifulSoup
 
 # CONSTANTS
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-HEADERS_FILE = os.path.join(SCRIPT_DIR, "calendar_headers_list.yaml")
 CALENDAR_URL = "https://exactas.uba.ar/calendario-academico/"
 CURRENT_YEAR = datetime.now().year
+DAYS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+HEADERS_FILE = os.path.join(SCRIPT_DIR, "calendar_headers_list.yaml")
+# MONTHS_DICT = {
+#     "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
+#     "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
+# }
+MONTHS_DICT = {
+    "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
+    "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
+}
+
+
+
 
 def strip_event_affixes(event_name):
     """
@@ -62,8 +74,7 @@ def correct_month_name(month_input):
         list: A list containing the closest matching month found, or an empty list
               if no close match is found.
     """
-    months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
-             "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+    months = list(MONTHS_DICT.keys())
     matches = difflib.get_close_matches(month_input, months, n=1)
 
     return matches[0]
@@ -84,8 +95,7 @@ def correct_day_name(dayname_input):
         list: A list containing the closest matching day found, or an empty list
               if no close match is found.
     """
-    days = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
-    matches = difflib.get_close_matches(dayname_input, days, n=1)
+    matches = difflib.get_close_matches(dayname_input, DAYS, n=1)
 
     return matches[0]
 
@@ -431,12 +441,6 @@ def create_org_contents_from_holidays_header(soup):
 
     output_text = "** FERIADOS\n"
 
-    # Dictionary to convert month names to numbers
-    months_dict = {
-        "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
-        "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
-    }
-
     # Iterate over all table rows
     for row in holidays_table.find_all("tr"):
         # Extract all (td) cells from row
@@ -455,7 +459,7 @@ def create_org_contents_from_holidays_header(soup):
             try:
                 day_number, month_name = [x.strip() for x in date_in_text_format.split("de")]
                 month_name = correct_month_name(month_name)
-                month_number = months_dict[month_name.lower()]
+                month_number = MONTHS_DICT[month_name.lower()]
                 formatted_date_for_heading = f"{CURRENT_YEAR}-{month_number}-{day_number.zfill(2)}"
             except (ValueError, KeyError):
                 formatted_date_for_heading = "Fecha inválida"
@@ -474,11 +478,6 @@ def add_entries_for_science_week(soup, science_week_name):
 
     output_text = ""
 
-    months_dict = {"enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5,
-        "junio": 6, "julio": 7, "agosto": 8, "septiembre": 9,
-        "octubre": 10, "noviembre": 11, "diciembre": 12
-    }
-
     tag = soup.find("strong", string=science_week_name)
 
     if tag:
@@ -488,17 +487,17 @@ def add_entries_for_science_week(soup, science_week_name):
             # Clean up text and separate dates (3 days)
             science_week_dates_in_text_format = science_week_dates_in_text_format.strip()
 
-            for month in months_dict:
+            for month in MONTHS_DICT:
                 if month in science_week_dates_in_text_format.lower():
                     # Get the month number
-                    month_number = months_dict[month]
+                    month_number = MONTHS_DICT[month]
                     # Extract only days using regex
                     days = re.findall(r'\d+', science_week_dates_in_text_format.split(month)[0])
 
                     # Build a list of dates in YYYY-MM-DD format
                     dates = []
                     for day in days:
-                        date = datetime(CURRENT_YEAR, month_number, int(day)).date()
+                        date = datetime(CURRENT_YEAR, int(month_number), int(day)).date()
                         dates.append(date.strftime('%Y-%m-%d'))
 
                     output_text += f"*** {science_week_name}\n"
