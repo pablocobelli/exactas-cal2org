@@ -19,16 +19,10 @@ CALENDAR_URL = "https://exactas.uba.ar/calendario-academico/"
 CURRENT_YEAR = datetime.now().year
 DAYS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
 HEADERS_FILE = os.path.join(SCRIPT_DIR, "calendar_headers_list.yaml")
-# MONTHS_DICT = {
-#     "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
-#     "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
-# }
 MONTHS_DICT = {
     "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
     "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
 }
-
-
 
 
 def strip_event_affixes(event_name):
@@ -125,22 +119,22 @@ def get_date_or_timeframe(section_text):
         - If no match is found, the function prints a failure message and `out` remains undefined.
     """
 
-    # Regex para las fechas posibles
-    regex_fecha_unica = r"(\w+ \d{1,2} de \w+)"  # Una sola fecha
-    regex_plazo_mismo_mes = r"(\w+ \d{1,2}) al (\w+ \d{1,2} de \w+)"  # Plazo en el mismo mes
-    regex_plazo_diferente_mes = r"(\w+ \d{1,2} de \w+) al (\w+ \d{1,2} de \w+)"  # Plazo en diferentes meses
+    # Regex for detecting possible date formats
+    regex_fecha_unica = r"(\w+ \d{1,2} de \w+)"  # Just one date
+    regex_plazo_mismo_mes = r"(\w+ \d{1,2}) al (\w+ \d{1,2} de \w+)"  # Multiple days in same month
+    regex_plazo_diferente_mes = r"(\w+ \d{1,2} de \w+) al (\w+ \d{1,2} de \w+)"  # Multiple days in different months
 
-    # Lista de regex con un orden de prioridad
+    # Regex list with a priority order
     regex_list = [
-        (regex_fecha_unica, 3),  # Prioridad 1: Solo una fecha
-        (regex_plazo_mismo_mes, 2),  # Prioridad 2: Plazo en el mismo mes
-        (regex_plazo_diferente_mes, 1)  # Prioridad 3: Plazo en diferentes meses
+        (regex_fecha_unica, 3),  # Priority 1: just one date
+        (regex_plazo_mismo_mes, 2),  # Priority 2: multiple days in same month
+        (regex_plazo_diferente_mes, 1)  # Priority 3: multiple days in different months
     ]
 
-    # Lista para almacenar las coincidencias encontradas
+    # List to store found matches
     matches = []
 
-    # Intentamos cada regex en el orden de la lista
+    # Each regex is tried in the list's order
     for regex, priority in regex_list:
         coincidence = re.search(regex, section_text)
         if coincidence:
@@ -154,10 +148,10 @@ def get_date_or_timeframe(section_text):
                 ending_date = coincidence.group(2)
                 matches.append((starting_date, ending_date, priority))
 
-    # Si encontramos coincidencias, las ordenamos por prioridad
+    # If matches found, order them by priority
     if matches:
-        matches.sort(key=lambda x: x[-1])  # Ordenamos por el último elemento de las tuplas (priority)
-        # Retornamos la coincidencia de mayor prioridad
+        matches.sort(key=lambda x: x[-1])  # Ordering by last element in the tuples (i.e., priority)
+        # Return match with highest priority
         if len(matches[0]) == 2:
             out = [matches[0][0]]
             single_date_boolean = True
@@ -170,7 +164,7 @@ def get_date_or_timeframe(section_text):
                 out = [matches[0][0], matches[0][1]]
             single_date_boolean = False
     else:
-        # Si no encontramos ninguna coincidencia
+        # If no matches are found
         print('Failed to find date or period in string.')
 
     return out, single_date_boolean
@@ -514,7 +508,7 @@ def add_entries_for_science_week(soup, science_week_name):
     return None
 
 def create_org_contents_from_science_weeks_header(soup):
-    # quizás estas entradas de busqueda podrian leerse del yaml para evitar tener que modificar esto en el codigo en el futuro?
+    # These entries could be read from the YAML
     print("** SEMANAS DE LAS CIENCIAS")
     add_entries_for_science_week(soup, "Semana de la Matemática y de las Ciencias de Datos")
     add_entries_for_science_week(soup, "Semana de las Ciencias de la Tierra")
