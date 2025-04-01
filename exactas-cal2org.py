@@ -26,7 +26,6 @@ MONTHS_DICT = {
     "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
 }
 
-
 def strip_event_affixes(event_name):
     """
     Removes predefined prefixes and suffixes from an event name.
@@ -54,7 +53,6 @@ def strip_event_affixes(event_name):
 
     return event_name
 
-
 def correct_month_name(month_input):
     """
     Corrects a possibly misspelled month name using approximate matches.
@@ -75,7 +73,6 @@ def correct_month_name(month_input):
 
     return matches[0]
 
-
 def correct_day_name(dayname_input):
     """
     Corrects a possibly misspelled day name using approximate matches.
@@ -94,7 +91,6 @@ def correct_day_name(dayname_input):
     matches = difflib.get_close_matches(dayname_input, DAYS, n=1)
 
     return matches[0]
-
 
 def get_date_or_timeframe(section_text):
     """
@@ -171,7 +167,6 @@ def get_date_or_timeframe(section_text):
 
     return out, single_date_boolean
 
-
 def read_html_source_from_url(url):
     """
     Fetches and parses the HTML content from the given URL.
@@ -196,7 +191,6 @@ def read_html_source_from_url(url):
     # Parse the HTML content of the page
     soup = BeautifulSoup(response.text, "html.parser")
     return soup
-
 
 def get_section_lines(soup, target_header):
     """
@@ -232,7 +226,6 @@ def get_section_lines(soup, target_header):
 
     return section_text
 
-
 def read_event_list_from_yaml(yaml_file):
     """
     Reads a list of required events from a YAML file.
@@ -251,12 +244,11 @@ def read_event_list_from_yaml(yaml_file):
         UnicodeDecodeError: If the file encoding is not compatible with UTF-8.
     """
 
-    # Leer el archivo YAML
+    # Read YAML file
     with open(yaml_file, "r", encoding="utf-8") as file:
         required_events = yaml.safe_load(file)
 
     return required_events
-
 
 def normalize_event_casing(event_name):
     """
@@ -276,7 +268,6 @@ def normalize_event_casing(event_name):
     'Science fair'
     """
     return event_name.lower().capitalize()
-
 
 def parse_date_from_string(date_in_text_format):
     """
@@ -314,7 +305,6 @@ def parse_date_from_string(date_in_text_format):
     date_in_universal_format = dateparser.parse(date_in_natural_language).date()
 
     return date_in_universal_format
-
 
 def create_org_contents_from_calendar_headers(soup, cal_headers):
     """
@@ -405,7 +395,6 @@ def create_org_contents_from_calendar_headers(soup, cal_headers):
                         extra_suffix_for_multiple_exam_dates)
                     print(period)
 
-
 def main():
     """Fetch the academic calendar, extract events, and print them in Org-mode format."""
 
@@ -479,7 +468,7 @@ def add_entries_for_science_week(soup, science_week_name):
 
     if tag:
         # Get next sibling containing the text following the match
-        science_week_dates_in_text_format = tag.find_next_sibling(string=True)  # Usamos 'string=True' para obtener solo el texto
+        science_week_dates_in_text_format = tag.find_next_sibling(string=True)  # Using 'string=True' to get only the text
         if science_week_dates_in_text_format:
             # Clean up text and separate dates (3 days)
             science_week_dates_in_text_format = science_week_dates_in_text_format.strip()
