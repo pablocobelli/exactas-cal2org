@@ -13,15 +13,11 @@ import requests
 import dateparser
 from bs4 import BeautifulSoup
 
-# Get the script directory to locate calendar_headers_list.yaml file
-script_dir = os.path.dirname(os.path.abspath(__file__))
-HEADERS_FILE = os.path.join(script_dir, "calendar_headers_list.yaml")
-
 # CONSTANTS
-# URL of the Exactas academic calendar webpage
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+HEADERS_FILE = os.path.join(SCRIPT_DIR, "calendar_headers_list.yaml")
 CALENDAR_URL = "https://exactas.uba.ar/calendario-academico/"
-# # YAML file containing the calendar headers to extract
-# HEADERS_FILE = "calendar_headers_list.yaml"
+CURRENT_YEAR = datetime.now().year
 
 def strip_event_affixes(event_name):
     """
@@ -314,7 +310,7 @@ def parse_date_from_string(date_in_text_format):
     return date_in_universal_format
 
 
-def create_org_from_calendar_headers(soup, cal_headers):
+def create_org_contents_from_calendar_headers(soup, cal_headers):
     """
     Extracts events from calendar headers and formats them as an Org-mode file structure,
     for use with org-agenda.
@@ -361,8 +357,7 @@ def create_org_from_calendar_headers(soup, cal_headers):
 
     """
 
-    current_year = str(datetime.now().year)
-    print("* " + current_year)
+    print("* " + str(CURRENT_YEAR))
 
     for cal_header, cal_header_short_name in cal_headers.items():
         print("** " + cal_header)
@@ -424,10 +419,112 @@ def main():
     # Process each calendar section based on the given headers,
     # extract events, and print them line by line in Org-mode format
     # for their use with org-agenda
-    create_org_from_calendar_headers(soup, cal_headers)
+    create_org_contents_from_calendar_headers(soup, cal_headers)
+    create_org_contents_from_holidays_header(soup)
+    create_org_contents_from_science_weeks_header(soup)
 
     return 0
 
+def create_org_contents_from_holidays_header(soup):
+    # Holidays are listed in the last table of the website
+    holidays_table = soup.find_all("table")[-1]
+
+    output_text = "** FERIADOS\n"
+
+    # Dictionary to convert month names to numbers
+    months_dict = {
+        "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
+        "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
+    }
+
+    # Iterate over all table rows
+    for row in holidays_table.find_all("tr"):
+        # Extract all (td) cells from row
+        cells = row.find_all("td")
+        if cells:  # Verify there are cells in the row
+            # Extract the text of each cell, stripping white space and correcting for possible typos
+            day_name = cells[0].get_text(strip=True)
+            day_name = correct_day_name(day_name)
+            date_in_text_format = cells[1].get_text(strip=True)
+            event = cells[2].get_text(strip=True)
+            condition = cells[3].get_text(strip=True)
+            if not condition:
+                condition = "No especificada en el sitio web"
+
+            # We convert date_in_text_format (e.g., 23 de abril) to "YYYY-MM-DD" format
+            try:
+                day_number, month_name = [x.strip() for x in date_in_text_format.split("de")]
+                month_name = correct_month_name(month_name)
+                month_number = months_dict[month_name.lower()]
+                formatted_date_for_heading = f"{CURRENT_YEAR}-{month_number}-{day_number.zfill(2)}"
+            except (ValueError, KeyError):
+                formatted_date_for_heading = "Fecha inválida"
+
+            # Build the holiday entry for current line in table
+            output_text += f"*** Feriado: {event} ({day_name} {day_number} de {month_name})\n"
+            output_text += f"<{formatted_date_for_heading}>\n"
+            output_text += f"Condición: {condition}.\n"
+
+    # Print the holidays section
+    print(output_text)
+    return None
+
+
+def add_entries_for_science_week(soup, science_week_name):
+
+    output_text = ""
+
+    months_dict = {"enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5,
+        "junio": 6, "julio": 7, "agosto": 8, "septiembre": 9,
+        "octubre": 10, "noviembre": 11, "diciembre": 12
+    }
+
+    tag = soup.find("strong", string=science_week_name)
+
+    if tag:
+        # Get next sibling containing the text following the match
+        science_week_dates_in_text_format = tag.find_next_sibling(string=True)  # Usamos 'string=True' para obtener solo el texto
+        if science_week_dates_in_text_format:
+            # Clean up text and separate dates (3 days)
+            science_week_dates_in_text_format = science_week_dates_in_text_format.strip()
+
+            for month in months_dict:
+                if month in science_week_dates_in_text_format.lower():
+                    # Get the month number
+                    month_number = months_dict[month]
+                    # Extract only days using regex
+                    days = re.findall(r'\d+', science_week_dates_in_text_format.split(month)[0])
+
+                    # Build a list of dates in YYYY-MM-DD format
+                    dates = []
+                    for day in days:
+                        date = datetime(CURRENT_YEAR, month_number, int(day)).date()
+                        dates.append(date.strftime('%Y-%m-%d'))
+
+                    output_text += f"*** {science_week_name}\n"
+                    output_text += f"<{dates[0]}>-<{dates[2]}>"
+                    break
+            else:
+                print("Mes no encontrado en el texto.")
+        else:
+            print("No se encontró la fecha después del texto buscado.")
+    else:
+        print("Texto no encontrado en la página.")
+
+    print(output_text)
+    return None
+
+def create_org_contents_from_science_weeks_header(soup):
+    # quizás estas entradas de busqueda podrian leerse del yaml para evitar tener que modificar esto en el codigo en el futuro?
+    print("** SEMANAS DE LAS CIENCIAS")
+    add_entries_for_science_week(soup, "Semana de la Matemática y de las Ciencias de Datos")
+    add_entries_for_science_week(soup, "Semana de las Ciencias de la Tierra")
+    add_entries_for_science_week(soup, "Semana de la Física")
+    add_entries_for_science_week(soup, "Semana de la Computación y de las Ciencias de Datos")
+    add_entries_for_science_week(soup, "Semana de la Biología")
+    add_entries_for_science_week(soup, "Semana de la Química y de los Alimentos")
+    add_entries_for_science_week(soup, "Semana de la Enseñanza de las Ciencias")
+    return None
 
 if __name__ == '__main__':
     sys.exit(main())
